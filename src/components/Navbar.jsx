@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import { useState } from 'react'
-import {FaSearch,FaPowerOff} from 'react-icons';
+import {FaSearch,FaPowerOff} from 'react-icons/fa';
 import { signOut } from 'firebase/auth';
 import { firebaseAuth } from '../utils/firebase-config';
 
