@@ -27,3 +27,15 @@ body::-webkit-scrollbar{
   display: none;
 
 }
+
+.show-search{
+  border:1px solid white;
+  background-color: rgba(0,0,0,0.6);
+  input{
+    width: 100%;
+    opacity: 1;
+    display: block;
+    padding: 0.3rem;
+  }
+
+}
