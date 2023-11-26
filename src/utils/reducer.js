@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import axios from 'axios';
 import { API_KEY, TMDB_BASE_URL, reducerCases } from './constants';
-import { useStateProvider } from './StateProvider';
+
 
 export const initialState = {
   movies:[],
@@ -40,7 +40,7 @@ const createArrayFromRawData = (array,moviesArray,genres) => {
   })
 }
 
-const getRawData = async(api,genres,paging = false) =>{
+export const getRawData = async(api,genres,paging = false) =>{
   const moviesArray = [];
   for (let i = 1;moviesArray.length < 60 && i < 10; i++){
     const {
@@ -52,8 +52,7 @@ const getRawData = async(api,genres,paging = false) =>{
 }
 
 
-export const fetchDataByGenre = async ({genre,type}) => {
-  const [{ genres }, dispatch] = useStateProvider();
+export const fetchDataByGenre = async (genre,genres,dispatch,type) => {
   try {
     const rawData = await getRawData(`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`,genres)
     dispatch({type:reducerCases.SET_GENRES_FROM_TYPE,payload:rawData})
@@ -64,6 +63,16 @@ export const fetchDataByGenre = async ({genre,type}) => {
   }
 }
 
+export const fetchMovies = async (genres,type,dispatch) => {
+  try {
+    const rawData = await getRawData(`${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}`,genres,true)
+    dispatch({type:reducerCases.SET_MOVIES,payload:rawData})
+    console.log(rawData)
+    return rawData
+  }catch(err){
+    console.error('Error fetching movies :',err);
+  }
+}
 
 
 const reducer = (state,action) => {
@@ -80,6 +89,12 @@ const reducer = (state,action) => {
         ...state,
         genres:action.payload,
         genresLoaded:true
+      }
+    }
+    case reducerCases.SET_MOVIES:{
+      return{
+        ...state,
+        movies:action.payload,
       }
     }
     default:
