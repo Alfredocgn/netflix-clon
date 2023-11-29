@@ -3,6 +3,6 @@ export const TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 export const reducerCases = {
   SET_GENRES : "SET_GENRES",
-  SET_GENRES_FROM_TYPE:"SET_GENRES_FROM_TYPE",
+  SET_GENRES_FROM_TYPE:"SET_TYPE_WITH_GENRE",
   SET_MOVIES:"SET_MOVIES"
 }

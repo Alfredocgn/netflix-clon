@@ -10,67 +10,45 @@ export const initialState = {
 
 }
 
+
 export const getGenres = async(dispatch) =>{
-  try {
-    const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list?api_key=${API_KEY}`)
-    const {genres} = response.data;
-    dispatch({type: reducerCases.SET_GENRES, payload:genres})
-    return genres;
+  try{
+    const url = `${TMDB_BASE_URL}/genre/movie/list?api_key=${API_KEY}`
+    const response = await axios.get(url);
+    const {data} = response;
+
+    dispatch({type:reducerCases.SET_GENRES,payload:data})
+    return data
   }catch(err){
-    console.error('Error fetching genres :',err)
+    console.error("Error fetching genres:",err)
   }
-
-}
-
-const createArrayFromRawData = (array,moviesArray,genres) => {
-  array.forEach((movie)=>{
-    const movieGenres = [];
-    movie.genre_ids.forEach((genre)=>{
-      const name = genres.find(({id})=> id === genre)
-      if(name) movieGenres.push(name.name)
-    })
-  if(movie.backdrop_path){
-    moviesArray.push({
-      id:movie.id,
-      name:movie?.original_name ? movie.original_name : movie.original_title,
-      image:movie.backdrop_path,
-      genres:movieGenres.slice(0,3),
-    })
-  }
-  })
-}
-
-export const getRawData = async(api,genres,paging = false) =>{
-  const moviesArray = [];
-  for (let i = 1;moviesArray.length < 60 && i < 10; i++){
-    const {
-      data:{results},
-    } = await axios.get(`${api}${paging ?  `&page=${i}` : ""}`);
-    createArrayFromRawData(results,moviesArray,genres);
-  }
-  return moviesArray;
 }
 
 
-export const fetchDataByGenre = async (genre,genres,dispatch,type) => {
+export const fetchMovies = async (dispatch) => {
   try {
-    const rawData = await getRawData(`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`,genres)
-    dispatch({type:reducerCases.SET_GENRES_FROM_TYPE,payload:rawData})
-    return rawData
-  }catch(err){
-    console.error('Error fetching data by genre :',err);
-    throw err
-  }
-}
-
-export const fetchMovies = async (genres,type,dispatch) => {
-  try {
-    const rawData = await getRawData(`${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}`,genres,true)
-    dispatch({type:reducerCases.SET_MOVIES,payload:rawData})
-    console.log(rawData)
-    return rawData
+    const url = `${TMDB_BASE_URL}/trending/movie/week?api_key=${API_KEY}`
+    const response = await axios.get(url)
+    const {data} = response
+    dispatch({type:reducerCases.SET_MOVIES,payload:data})
+    return data
   }catch(err){
     console.error('Error fetching movies :',err);
+    throw err;
+  }
+}
+
+export const fetchDataByTypeAndGenre = async(type ='movie',genreId,dispatch) => {
+  try {
+    const url = `${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genreId}`
+    const response = await axios.get(url)
+    const data = response.data
+    dispatch({type:reducerCases.SET_TYPE_WITH_GENRE,payload:data})
+    return data
+
+  }catch(err){
+    console.error("Error fetching with genre :",err)
+    throw err;
   }
 }
 
@@ -84,17 +62,16 @@ const reducer = (state,action) => {
         genresLoaded:true
       }
     }
-    case reducerCases.SET_GENRES_FROM_TYPE:{
-      return {
-        ...state,
-        genres:action.payload,
-        genresLoaded:true
-      }
-    }
     case reducerCases.SET_MOVIES:{
       return{
         ...state,
         movies:action.payload,
+      }
+    }
+    case reducerCases.SET_TYPE_WITH_GENRE:{
+      return {
+        ...state,
+        typeWithGenre: action.payload
       }
     }
     default:

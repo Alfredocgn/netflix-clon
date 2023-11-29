@@ -5,7 +5,7 @@ import movieLogo from '../assets/homeTitle.webp';
 import {FaPlay} from 'react-icons/fa'
 import {AiOutlineInfoCircle} from 'react-icons/ai'
 import { useNavigate } from "react-router-dom";
-import { getGenres, getRawData } from "../utils/reducer";
+import { fetchDataByTypeAndGenre, fetchMovies, getGenres } from "../utils/reducer";
 import { useStateProvider } from "../utils/StateProvider";
 import { API_KEY, TMDB_BASE_URL, reducerCases } from "../utils/constants";
 
@@ -18,54 +18,42 @@ export const Netflix = () => {
   }
   const navigate = useNavigate();
 
-  const [{genres,movies},dispatch] = useStateProvider();
+  const [{genres,movies,typeWithGenre},dispatch] = useStateProvider();
 
-const fetchMovies = async ({type}) => {
-
-    try {
-      const rawData = await getRawData(`${TMDB_BASE_URL}/trending/${type}/week?api_key=${API_KEY}`,genres,true)
-      dispatch({type:reducerCases.SET_MOVIES,payload:rawData})
-      console.log(rawData)
-      return rawData
-    }catch(err){
-      console.error('Error fetching movies :',err);
-    }
-  }
-
-    useEffect(()=>{
-      getGenres(dispatch)
-    },[dispatch])
 
     useEffect(()=> {
-
-      const fetchData = async () => {
-        try{
-          await fetchMovies({type:'action'});
-          console.log(movies)
-
-        }catch(error){
+        getGenres(dispatch)
+        .then(genresData => {
+          console.log("Genres:",genresData)
+        }).catch(error => {
           console.error(error)
-        }
-      }
-      fetchData()
-    },[])
+        })
+      
+
+
+    },[dispatch])
 
     useEffect(()=>{
-      console.log(movies)
-    },[movies])
+      fetchMovies(dispatch).then(moviesData => {
+        console.log("Movies:",moviesData.results)
+      }).catch(error => {
+        console.error(error)
+      })
+    },[dispatch])
+
+    useEffect(()=>{
+      fetchDataByTypeAndGenre("movie",28,dispatch).then(typeData => {
+        console.log("Movie type:",typeData.results)
+      }).catch(error => {
+        console.error(error)
+      })
+    },[dispatch])
+
+
 
     return (
     <div className="Container bg-black ">
       <Navbar isScrolled={isScrolled} />
-      <div>
-        {
-          movies.map((movie)=>(
-            <div key={movie.id} className="movie-card"><h3>{movie}</h3></div>
-          ))
-
-
-        }
-      </div>
       <div className="hero relative ">
         <img src={backgroundImage} alt="background" className="brightness-75 h-[100vh] w-[100vw]" />
         <div className="container absolute bottom-20 ">
