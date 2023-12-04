@@ -16,41 +16,55 @@ export const getGenres = async(dispatch) =>{
     const url = `${TMDB_BASE_URL}/genre/movie/list?api_key=${API_KEY}`
     const response = await axios.get(url);
     const {data} = response;
+    const genres = data.genres || []
 
-    dispatch({type:reducerCases.SET_GENRES,payload:data})
-    return data
+    dispatch({type:reducerCases.SET_GENRES,payload:genres})
+    return genres
   }catch(err){
     console.error("Error fetching genres:",err)
   }
 }
 
+const createArrayFromRawData=(array,moviesArray,genres) => {
+  array.forEach((movie)=>{
+    const movieGenres = [];
+    movie.genre_ids.forEach((genre) => {
+      const name = genres.find(({id})=> id === genre);
+      if (name) movieGenres.push(name.name)
+    })
+  if(movie.backdrop_path){
+    moviesArray.push({
+      id:movie.id,
+      name:movie?.original_name ? movie.original_name : movie.original_title,
+      image:movie.backdrop_path,
+      genres:movieGenres.slice(0,3),
+    })
+  }
+  })
+}
+
+
+
 
 export const fetchMovies = async (dispatch) => {
   try {
+    const genres = await getGenres(dispatch)
     const url = `${TMDB_BASE_URL}/trending/movie/week?api_key=${API_KEY}`
     const response = await axios.get(url)
     const {data} = response
-    dispatch({type:reducerCases.SET_MOVIES,payload:data})
-    return data
+    const moviesArray = []
+
+    createArrayFromRawData(data.results,moviesArray,genres)
+    dispatch({type:reducerCases.SET_MOVIES,payload:moviesArray})
+    return moviesArray
   }catch(err){
     console.error('Error fetching movies :',err);
     throw err;
   }
 }
 
-export const fetchDataByTypeAndGenre = async(type ='movie',genreId,dispatch) => {
-  try {
-    const url = `${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genreId}`
-    const response = await axios.get(url)
-    const data = response.data
-    dispatch({type:reducerCases.SET_TYPE_WITH_GENRE,payload:data})
-    return data
 
-  }catch(err){
-    console.error("Error fetching with genre :",err)
-    throw err;
-  }
-}
+
 
 
 const reducer = (state,action) => {
@@ -61,6 +75,7 @@ const reducer = (state,action) => {
         genres:action.payload,
         genresLoaded:true
       }
+
     }
     case reducerCases.SET_MOVIES:{
       return{

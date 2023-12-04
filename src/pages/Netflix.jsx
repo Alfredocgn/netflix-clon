@@ -5,7 +5,7 @@ import movieLogo from '../assets/homeTitle.webp';
 import {FaPlay} from 'react-icons/fa'
 import {AiOutlineInfoCircle} from 'react-icons/ai'
 import { useNavigate } from "react-router-dom";
-import { fetchDataByTypeAndGenre, fetchMovies, getGenres } from "../utils/reducer";
+import {  fetchMovies, getGenres } from "../utils/reducer";
 import { useStateProvider } from "../utils/StateProvider";
 import { Slider } from "../components/Slider";
 
@@ -19,36 +19,22 @@ export const Netflix = () => {
   }
   const navigate = useNavigate();
 
-  const [{genres,movies,typeWithGenre},dispatch] = useStateProvider();
+  const [{genres,movies},dispatch] = useStateProvider();
 
 
-    useEffect(()=> {
-        getGenres(dispatch)
-        .then(genresData => {
-          // console.log("Genres:",genresData)
-        }).catch(error => {
+    useEffect(() => {
+      const fetchData = async () => {
+        try{
+          const genresData  = await getGenres(dispatch);
+          const moviesData = await fetchMovies(dispatch)
+
+        }catch(error){
           console.error(error)
-        })
-      
-
-
+        }
+      }
+      fetchData()
     },[dispatch])
 
-    useEffect(()=>{
-      fetchMovies(dispatch).then(moviesData => {
-        // console.log("Movies:",moviesData.results)
-      }).catch(error => {
-        console.error(error)
-      })
-    },[dispatch])
-
-    useEffect(()=>{
-      fetchDataByTypeAndGenre("movie",28,dispatch).then(typeData => {
-        
-      }).catch(error => {
-        console.error(error)
-      })
-    },[dispatch])
 
 
 
