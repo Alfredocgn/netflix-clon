@@ -5,9 +5,9 @@ import movieLogo from '../assets/homeTitle.webp';
 import {FaPlay} from 'react-icons/fa'
 import {AiOutlineInfoCircle} from 'react-icons/ai'
 import { useNavigate } from "react-router-dom";
-import {  fetchMovies, getGenres } from "../utils/reducer";
+import { fetchMovies, getGenres } from "../utils/reducer";
 import { useStateProvider } from "../utils/StateProvider";
-import { Slider } from "../components/Slider";
+import {Slider} from "../components/Slider"
 
 
 
@@ -27,6 +27,7 @@ export const Netflix = () => {
         try{
           const genresData  = await getGenres(dispatch);
           const moviesData = await fetchMovies(dispatch)
+          
 
         }catch(error){
           console.error(error)

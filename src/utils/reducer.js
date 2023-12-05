@@ -62,7 +62,23 @@ export const fetchMovies = async (dispatch) => {
     throw err;
   }
 }
+const getRawData = async (api, genres, paging = false) => {
+  const moviesArray = [];
+  for (let i = 1; moviesArray.length < 60 && i < 10; i++) {
+    const {
+      data: { results },
+    } = await axios.get(`${api}${paging ? `&page=${i}` : ""}`);
+    createArrayFromRawData(results, moviesArray, genres);
+  }
+  return moviesArray;
+};
 
+export const fetchDataByGenre = async (dispatch,{genre,type}) => {
+  const genres = await getGenres(dispatch)
+  const url =`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`
+  return getRawData(url,genres)
+
+}
 
 
 
