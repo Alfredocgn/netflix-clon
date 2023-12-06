@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useStateProvider } from "../utils/StateProvider";
-import { getGenres } from "../utils/reducer";
+import { fetchDataByGenre, getGenres } from "../utils/reducer";
 
 
-export const SelectedGenre = () => {
+export const SelectedGenre = ({parentType}) => {
     const [{genres},dispatch] = useStateProvider();
     const[selectedGenre,setSelectedGenre]=useState("")
 
@@ -21,16 +21,22 @@ export const SelectedGenre = () => {
         fetchData()
         },[dispatch])
 
-        const handleGenreChange=(event) =>{
-            setSelectedGenre(event.target.value)
+        const handleGenreChange= async (event) =>{
+            const genreId = event.target.value
+            setSelectedGenre(genreId)
+            try{ 
+                await fetchDataByGenre(dispatch,{genre:genreId,type:parentType})
+
+            }catch(error){
+                console.error
+            }
         }
         
     return (
-        <select className="text-black bg-white" value={selectedGenre} onChange={handleGenreChange}>
+        <select className=" ml-[5rem] cursor-pointer text-md bg-[rgba(0,0,0,0.4)] text-white" value={selectedGenre} onChange={handleGenreChange}>
             <option value={""} disabled>Select Genre</option>
             {
                 genres.map((genre) => {
-                    console.log(genre.name)
                     return (
                         <option value={genre.id} key={genre.id} >
                             {genre.name}

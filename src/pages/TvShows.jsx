@@ -7,7 +7,7 @@ import { NotAvailable } from "../components/NotAvailable";
 import { Slider } from "../components/Slider";
 import { SelectedGenre } from "../components/SelectedGenre";
 
-export const Movies = () => {
+export const TvShows = () => {
     const [isScrolled,setIsScrolled] =useState(false);
     window.onscroll = () => {
     setIsScrolled(window.scrollY === 0 ? false : true );
@@ -16,7 +16,7 @@ export const Movies = () => {
     const navigate = useNavigate();        
 
     const [{movies},dispatch] = useStateProvider();
-
+    const type = "tv"
 
 
 
@@ -41,7 +41,7 @@ export const Movies = () => {
                 <Navbar isScrolled={isScrolled} />
             </div>
             <div className="data mt-32">
-                <SelectedGenre parentType="movie"/>
+                <SelectedGenre parentType="tv" />
                 {
                     movies.length ? <Slider movies={movies} /> : <NotAvailable/>
                 }

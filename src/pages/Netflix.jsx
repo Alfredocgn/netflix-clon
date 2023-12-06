@@ -39,6 +39,7 @@ export const Netflix = () => {
 
 
 
+
     return (
     <div className="Container bg-black ">
       <Navbar isScrolled={isScrolled} />

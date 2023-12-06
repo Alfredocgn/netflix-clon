@@ -5,8 +5,8 @@ import { API_KEY, TMDB_BASE_URL, reducerCases } from './constants';
 
 export const initialState = {
   movies:[],
-  genresLoaded:false,
   genres:[],
+
 
 }
 
@@ -50,11 +50,8 @@ export const fetchMovies = async (dispatch) => {
   try {
     const genres = await getGenres(dispatch)
     const url = `${TMDB_BASE_URL}/trending/movie/week?api_key=${API_KEY}`
-    const response = await axios.get(url)
-    const {data} = response
-    const moviesArray = []
-
-    createArrayFromRawData(data.results,moviesArray,genres)
+    const moviesArray = await getRawData(url,genres,true)
+  
     dispatch({type:reducerCases.SET_MOVIES,payload:moviesArray})
     return moviesArray
   }catch(err){
@@ -74,14 +71,19 @@ const getRawData = async (api, genres, paging = false) => {
 };
 
 export const fetchDataByGenre = async (dispatch,{genre,type}) => {
-  const genres = await getGenres(dispatch)
-  const url =`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`
-  return getRawData(url,genres)
+  try{
+    const genres = await getGenres(dispatch)
+    const url =`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`
+    const moviesArray = await getRawData(url,genres)
+    dispatch({type:reducerCases.SET_MOVIES,payload:moviesArray})
+    return moviesArray
+
+  }catch(err){
+    console.error("Error ",err)
+    throw err
+  }
 
 }
-
-
-
 
 const reducer = (state,action) => {
   switch(action.type){
@@ -89,7 +91,6 @@ const reducer = (state,action) => {
       return {
         ...state,
         genres:action.payload,
-        genresLoaded:true
       }
 
     }
@@ -97,12 +98,6 @@ const reducer = (state,action) => {
       return{
         ...state,
         movies:action.payload,
-      }
-    }
-    case reducerCases.SET_TYPE_WITH_GENRE:{
-      return {
-        ...state,
-        typeWithGenre: action.payload
       }
     }
     default:
