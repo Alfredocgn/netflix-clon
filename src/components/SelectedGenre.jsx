@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { useStateProvider } from "../utils/StateProvider";
 import { fetchDataByGenre, getGenres } from "../utils/reducer";
@@ -11,6 +12,7 @@ export const SelectedGenre = ({parentType}) => {
     useEffect(() => {
         const fetchData = async () => {
             try{
+                // eslint-disable-next-line no-unused-vars
                 const genresData  = await getGenres(dispatch);
             
 

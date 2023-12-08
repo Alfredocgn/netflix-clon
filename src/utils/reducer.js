@@ -6,6 +6,7 @@ import { API_KEY, TMDB_BASE_URL, reducerCases } from './constants';
 export const initialState = {
   movies:[],
   genres:[],
+  likedMovies:[],
 
 
 }
@@ -85,6 +86,19 @@ export const fetchDataByGenre = async (dispatch,{genre,type}) => {
 
 }
 
+export const getUserLikedMovies = async (dispatch,{email}) => {
+  try{
+    console.log("funciona",email)
+    const response = await axios.get(`http://localhost:5000/api/user/liked/${email}`)
+    const {likedMovies} = response.data
+    dispatch({type:reducerCases.SET_LIKED_MOVIES,payload:likedMovies})
+    return likedMovies
+  }catch(error){
+    console.error(error)
+    throw error
+  }
+}
+
 const reducer = (state,action) => {
   switch(action.type){
     case reducerCases.SET_GENRES:{
@@ -100,6 +114,14 @@ const reducer = (state,action) => {
         movies:action.payload,
       }
     }
+    case reducerCases.SET_LIKED_MOVIES:{
+      console.log("likedMovies",action.payload)
+      return{
+        ...state,
+        likedMovies:action.payload
+      }
+    }
+
     default:
       return state
   }
