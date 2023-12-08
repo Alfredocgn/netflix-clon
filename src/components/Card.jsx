@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
 import React,{ useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -7,10 +8,30 @@ import {RiThumbDownFill,RiThumbUpFill} from "react-icons/ri"
 import {BsCheck} from "react-icons/bs"
 import {AiOutlinePlus} from "react-icons/ai"
 import {BiChevronDown} from "react-icons/bi"
+import { onAuthStateChanged } from "firebase/auth";
+import { firebaseAuth } from "../utils/firebase-config";
+import axios from "axios"
 
 export const Card = React.memo(({movieData,isLiked =false}) => {
         const [isHovered,setIsHovered] = useState(false)
+        const [email,setEmail] = useState(undefined)
         const navigate = useNavigate()
+
+        onAuthStateChanged(firebaseAuth,(currentUser) => {
+            if (currentUser) {
+                setEmail(currentUser.email)
+            }else navigate("/login")
+        })
+
+        const addToList = async () => {
+            try{
+                await axios.post("http://localhost:5000/api/user/add",{email,data:movieData})
+                console.log(movieData)
+            }catch(err){
+                console.log(err)
+            }
+        }
+
         return (
             <div className='Container w-[230px] h-[100%] max-w-[230px] cursor-pointer relative ' onMouseEnter={()=> setIsHovered(true)} onMouseLeave={()=> setIsHovered(false)}>
                 <img className='rounded-md w-[100%] h-[100%] z-0  ' src={`https://image.tmdb.org/t/p/w500${movieData.image}`} alt="poster" />
@@ -32,7 +53,7 @@ export const Card = React.memo(({movieData,isLiked =false}) => {
                                         {
                                             isLiked ? (
                                                 <BsCheck className='text-xl cursor-pointer transition-all duration-300 ease-in-out hover:text-[#b8b8b8]' title="Remove from list"/> ) : (
-                                                <AiOutlinePlus className='text-xl cursor-pointer transition-all duration-300 ease-in-out hover:text-[#b8b8b8]' title="Add to list"/>
+                                                <AiOutlinePlus className='text-xl cursor-pointer transition-all duration-300 ease-in-out hover:text-[#b8b8b8]' title="Add to list" onClick={addToList} />
                                             )
                                         }
                                     </div>
