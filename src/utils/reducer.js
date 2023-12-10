@@ -7,6 +7,7 @@ export const initialState = {
   movies:[],
   genres:[],
   likedMovies:[],
+  series:[],
 
 
 }
@@ -60,6 +61,19 @@ export const fetchMovies = async (dispatch) => {
     throw err;
   }
 }
+export const fetchSeries = async (dispatch) => {
+  try {
+    const genres = await getGenres(dispatch)
+    const url = `${TMDB_BASE_URL}/trending/tv/week?api_key=${API_KEY}`
+    const seriesArray = await getRawData(url,genres,true)
+  
+    dispatch({type:reducerCases.SET_SERIES,payload:seriesArray})
+    return seriesArray
+  }catch(err){
+    console.error('Error fetching series :',err);
+    throw err;
+  }
+}
 const getRawData = async (api, genres, paging = false) => {
   const moviesArray = [];
   for (let i = 1; moviesArray.length < 60 && i < 10; i++) {
@@ -71,13 +85,27 @@ const getRawData = async (api, genres, paging = false) => {
   return moviesArray;
 };
 
-export const fetchDataByGenre = async (dispatch,{genre,type}) => {
+export const fetchMoviesByGenre = async (dispatch,{genre}) => {
   try{
     const genres = await getGenres(dispatch)
-    const url =`${TMDB_BASE_URL}/discover/${type}?api_key=${API_KEY}&with_genres=${genre}`
+    const url =`${TMDB_BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genre}`
     const moviesArray = await getRawData(url,genres)
     dispatch({type:reducerCases.SET_MOVIES,payload:moviesArray})
     return moviesArray
+
+  }catch(err){
+    console.error("Error ",err)
+    throw err
+  }
+
+}
+export const fetchSeriesByGenre = async (dispatch,{genre}) => {
+  try{
+    const genres = await getGenres(dispatch)
+    const url =`${TMDB_BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${genre}`
+    const seriesArray = await getRawData(url,genres)
+    dispatch({type:reducerCases.SET_SERIES,payload:seriesArray})
+    return seriesArray
 
   }catch(err){
     console.error("Error ",err)
@@ -115,10 +143,15 @@ const reducer = (state,action) => {
       }
     }
     case reducerCases.SET_LIKED_MOVIES:{
-      console.log("likedMovies",action.payload)
       return{
         ...state,
         likedMovies:action.payload
+      }
+    }
+    case reducerCases.SET_SERIES:{
+      return {
+        ...state,
+        series:action.payload
       }
     }
 

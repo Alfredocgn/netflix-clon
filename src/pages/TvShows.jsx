@@ -1,11 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import { fetchDataByGenre, fetchMovies, getGenres } from "../utils/reducer";
 import { useStateProvider } from "../utils/StateProvider";
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
 import { NotAvailable } from "../components/NotAvailable";
 import { Slider } from "../components/Slider";
 import { SelectedGenre } from "../components/SelectedGenre";
+import { fetchSeries } from "../utils/reducer";
 
 export const TvShows = () => {
     const [isScrolled,setIsScrolled] =useState(false);
@@ -13,21 +12,15 @@ export const TvShows = () => {
     setIsScrolled(window.scrollY === 0 ? false : true );
     return () => (window.onscroll = null)
     }
-    const navigate = useNavigate();        
+    // const navigate = useNavigate();        
 
-    const [{movies},dispatch] = useStateProvider();
-    const type = "tv"
-
-
-
+    const [{series},dispatch] = useStateProvider();
 
     useEffect(() => {
+
         const fetchData = async () => {
             try{
-
-                const moviesData = await fetchMovies(dispatch)
-                
-    
+                await fetchSeries(dispatch)   
             }catch(error){
                 console.error(error)
             }
@@ -35,15 +28,19 @@ export const TvShows = () => {
             fetchData()
         },[dispatch])
 
+
+
+
+
     return (
         <div className="Container ">
             <div className="navbar">
                 <Navbar isScrolled={isScrolled} />
             </div>
             <div className="data mt-32">
-                <SelectedGenre parentType="tv" />
+                <SelectedGenre />
                 {
-                    movies.length ? <Slider movies={movies} /> : <NotAvailable/>
+                    series.length ? <Slider movies={series} /> : <NotAvailable/>
                 }
             </div>
         </div>

@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { fetchDataByGenre, fetchMovies, getGenres } from "../utils/reducer";
+
+import { fetchMovies} from "../utils/reducer";
 import { useStateProvider } from "../utils/StateProvider";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
@@ -13,7 +13,6 @@ export const Movies = () => {
     setIsScrolled(window.scrollY === 0 ? false : true );
     return () => (window.onscroll = null)
     }
-    const navigate = useNavigate();        
 
     const [{movies},dispatch] = useStateProvider();
 
@@ -24,10 +23,7 @@ export const Movies = () => {
     useEffect(() => {
         const fetchData = async () => {
             try{
-
-                const moviesData = await fetchMovies(dispatch)
-                
-    
+                await fetchMovies(dispatch)
             }catch(error){
                 console.error(error)
             }
@@ -41,7 +37,7 @@ export const Movies = () => {
                 <Navbar isScrolled={isScrolled} />
             </div>
             <div className="data mt-32">
-                <SelectedGenre parentType="movie"/>
+                <SelectedGenre/>
                 {
                     movies.length ? <Slider movies={movies} /> : <NotAvailable/>
                 }

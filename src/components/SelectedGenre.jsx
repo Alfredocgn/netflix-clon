@@ -1,12 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { useStateProvider } from "../utils/StateProvider";
-import { fetchDataByGenre, getGenres } from "../utils/reducer";
+import { fetchMoviesByGenre, fetchSeriesByGenre, getGenres } from "../utils/reducer";
+import { useLocation } from "react-router-dom";
 
 
-export const SelectedGenre = ({parentType}) => {
+export const SelectedGenre = () => {
     const [{genres},dispatch] = useStateProvider();
     const[selectedGenre,setSelectedGenre]=useState("")
+    const location = useLocation();
 
 
     useEffect(() => {
@@ -24,10 +26,16 @@ export const SelectedGenre = ({parentType}) => {
         },[dispatch])
 
         const handleGenreChange= async (event) =>{
+            
             const genreId = event.target.value
             setSelectedGenre(genreId)
-            try{ 
-                await fetchDataByGenre(dispatch,{genre:genreId,type:parentType})
+            try{
+                const currentPath = location.pathname
+                if(currentPath === "/movies"){
+                    await fetchMoviesByGenre(dispatch,{genre:genreId})
+                }else if (currentPath === "/tv"){
+                    await fetchSeriesByGenre(dispatch,{genre:genreId})
+                }
 
             }catch(error){
                 console.error
