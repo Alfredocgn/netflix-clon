@@ -116,10 +116,11 @@ export const fetchSeriesByGenre = async (dispatch,{genre}) => {
 
 export const getUserLikedMovies = async (dispatch,{email}) => {
   try{
-    console.log("funciona",email)
+    console.log(email)
     const response = await axios.get(`http://localhost:5000/api/user/liked/${email}`)
     const {likedMovies} = response.data
     dispatch({type:reducerCases.SET_LIKED_MOVIES,payload:likedMovies})
+    console.log(likedMovies)
     return likedMovies
   }catch(error){
     console.error(error)
@@ -146,6 +147,7 @@ const reducer = (state,action) => {
       return{
         ...state,
         likedMovies:action.payload
+        
       }
     }
     case reducerCases.SET_SERIES:{

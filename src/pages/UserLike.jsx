@@ -18,29 +18,35 @@ export const UserLike = () => {
 
   const navigate = useNavigate()
 
-  onAuthStateChanged(firebaseAuth,(currentUser) => {
+  useEffect(()=>{
+    const unsubscribe = onAuthStateChanged(firebaseAuth,(currentUser) => {
       if (currentUser) {
           setEmail(currentUser.email)
       }else navigate("/login")
-  })   
+  }) 
+  return () => unsubscribe();
+  },[navigate])
+
+  
 
   const [dispatch,{likedMovies}] = useStateProvider();
-  console.log(likedMovies)
+
 
 useEffect(() => {
   const fetchData = async() => {
     if(email){
       try{
         console.log("email 1",email)
-        const movies = await dispatch(getUserLikedMovies(email))
-        console.log(movies)
+        await getUserLikedMovies(dispatch,{email})
+
       }catch(error){
         console.log(error)
       }
     }
   }
   fetchData()
-},[dispatch,email,])
+},[dispatch,email])
+
   return (
 
     <div className="Container">
@@ -50,7 +56,6 @@ useEffect(() => {
         <div className=" flex flex-wrap gap-4">
           {
             likedMovies.map((movie,index) => {
-              console.log(movie)
               return(
                 <Card 
                 movieData ={movie}
